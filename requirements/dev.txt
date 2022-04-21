@@ -1,0 +1,5 @@
+-r test.txt
+pydantic
+mongoengine
+loguru
+pyclean==2.2.0

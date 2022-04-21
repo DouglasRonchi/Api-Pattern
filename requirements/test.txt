@@ -1,0 +1,7 @@
+-r app.txt
+pytest
+pytest-cov
+pytest-mock
+mongomock
+testfixtures
+httpie==3.1.0
