@@ -1,7 +1,7 @@
 import os
 import unittest
 from http import HTTPStatus
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 from mongoengine import disconnect, connect

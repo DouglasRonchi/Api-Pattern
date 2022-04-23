@@ -19,8 +19,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends
 from starlette.responses import JSONResponse
 
-from app.models.validation.customer import Customer
-from app.schemas.swagger.customers import get_customer_by_id_responses
+from app.schemas.customer import CustomerSchema
+from app.schemas.swagger.customers import get_customer_by_id_responses, create_new_customer_responses
+from app.services.customer import CustomerService
 from app.utils.authentication import oauth2_scheme, decode_token
 from loguru import logger
 
@@ -121,15 +122,15 @@ def get_fake_customer(customer_id):
     return data
 
 
-@customers_endpoint_v1_router.post('/customers')
-def create_new_customer(customer: Customer):
+@customers_endpoint_v1_router.post('/customers', responses=create_new_customer_responses)
+def create_new_customer(customer: CustomerSchema):
     """
     Create a new customer and add it to the customers collection
     :return:
     """
     try:
         # decode_token(token.credentials)
-        # Create New Customer
+        CustomerService().create_new_customer(customer)
         return JSONResponse(status_code=http.HTTPStatus.CREATED)
     except Exception as err:
         logger.error(f"Error {err}")

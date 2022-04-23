@@ -2,7 +2,7 @@ import http
 from fastapi import APIRouter
 from starlette.responses import JSONResponse
 
-from app.db.mongo_repository import MongoDB
+from app.db.mongo.mongo_repository import MongoDB
 
 health_check_router = APIRouter()
 

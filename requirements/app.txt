@@ -1,9 +1,8 @@
-fastapi
-starlette
-requests
-mongoengine
-PyJWT
-pendulum
-uvicorn
-pymongo[srv]
-loguru
+fastapi==0.75.1
+starlette==0.19.1
+requests==2.27.1
+mongoengine==0.24.1
+PyJWT==2.3.0
+uvicorn==0.17.6
+pymongo==4.1.1
+loguru==0.6.0

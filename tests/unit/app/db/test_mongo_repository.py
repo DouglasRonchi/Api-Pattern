@@ -4,7 +4,7 @@ This is a test mongo repository module
 import unittest
 from unittest.mock import patch
 
-from app.db.mongo_repository import MongoDB
+from app.database.mongo.mongo_repository import MongoDB
 
 
 class TestMongoRepository(unittest.TestCase):

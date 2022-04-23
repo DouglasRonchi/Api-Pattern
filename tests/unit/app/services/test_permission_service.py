@@ -7,7 +7,7 @@ from mongoengine import connect, disconnect
 from app.models.database.permission import Permission
 from app.models.database.session import Session
 from app.models.database.customer import User
-from app.services.permission_service import PermissonService
+from app.services.customer import PermissonService
 from tests.db_test_data.customers import load_db_data, create_example_expired_token, user_data
 
 

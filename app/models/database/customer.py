@@ -1,18 +1,17 @@
 from datetime import datetime
-from uuid import uuid4
 from mongoengine import Document, StringField, DateTimeField
 
-from app.db.safe_document_mixing import SafeDocumentMixin
+from app.db.mongo.mongo_safe_document import SafeDocument
 
 
-class Customer(Document, SafeDocumentMixin):
-
-    id = StringField(required=True, unique=True, default=uuid4())
+class Customer(Document, SafeDocument):
     name = StringField(required=True)
+    cpf = StringField(required=True, unique=True, max_length=11)
+    city = StringField(required=True)
     created_at = DateTimeField(required=True, default=datetime.now())
-    updated_at = DateTimeField()
+    updated_at = DateTimeField(required=True)
 
     meta = {
         "collection": "customers",
-        "indexes": ["id", "name"]
+        "indexes": ["name"]
     }

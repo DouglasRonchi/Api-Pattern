@@ -5,15 +5,16 @@ import mongoengine
 from mongoengine import ConnectionFailure
 from pymongo.errors import ServerSelectionTimeoutError, OperationFailure
 
+from app.db.database_interface import DatabaseInterface
 from app.settings.settings import Settings
 from loguru import logger
 
 
-class MongoDB:
+class MongoDB(DatabaseInterface):
     def __init__(self):
-        self.__set_connection()
+        self.client = None
 
-    def __set_connection(self):
+    def connect(self):
         try:
             logger.debug('Connecting to Mongo')
             self.client = mongoengine.connect(host=Settings().MONGODB_URI)

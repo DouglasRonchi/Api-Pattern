@@ -1,5 +1,5 @@
 """
-This is a safe document mixing module
+This is a safe document mixin module
 """
 import logging
 import time
@@ -12,7 +12,7 @@ from app.exceptions.exceptions import (
 )
 
 
-class SafeDocumentMixin:
+class SafeDocument:
     def save_safe(self, *args, **kwargs):
         for attempt in range(5):
             try:

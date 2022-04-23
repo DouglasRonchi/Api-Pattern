@@ -4,7 +4,7 @@ A ApiType enum module
 from enum import Enum
 
 
-class ApiType(Enum):
+class ApiType(str, Enum):
     """
     APIs can be divided into three major groups:
 

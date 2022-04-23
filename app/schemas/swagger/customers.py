@@ -31,3 +31,9 @@ get_customer_by_id_responses = {
     404: {"model": Message, "description": "The permissions cannot be retrieved"},
     400: {"model": BadRequestPattern, "description": "Sending invalid data (data types, values)"}
 }
+
+create_new_customer_responses = {
+    201: {"model": None, "description": "When customer was created successfully"},
+    404: {"model": Message, "description": "Not Found"},
+    400: {"model": BadRequestPattern, "description": "Sending invalid data (data types, values)"}
+}

@@ -5,7 +5,7 @@ import unittest
 from mongoengine import QuerySet, Document, StringField, disconnect, connect
 from unittest.mock import patch
 
-from app.db.safe_document_mixing import SafeDocumentMixin
+from app.database.mongo.mongo_safe_document import SafeDocumentMixin
 from app.exceptions.exceptions import (
     MongoSaveException,
     MongoObjectsException,
