@@ -15,6 +15,8 @@ import http
 
 from fastapi import APIRouter, Depends
 from starlette.responses import JSONResponse
+
+from app.exceptions.exceptions import UnauthorizedException, ForbiddenException
 from app.utils.authentication import oauth2_scheme, decode_token
 from loguru import logger
 
@@ -22,16 +24,21 @@ processes_endpoint_v1_router = APIRouter()
 
 
 @processes_endpoint_v1_router.get('/processes/{process_id}')
-def get_process_status_by_id(process_id):
+def get_process_status_by_id(process_id,
+                             token: any = Depends(oauth2_scheme)):
     """
     Used to get status of a process by process_id
     :return: 200 - Status of process
     """
     try:
-        # decode_token(token.credentials)
+        decode_token(token.credentials)
         # TODO just to show how was the returns: Must be removed: Need to Implement
         response = make_fake_process_response(process_id)
         return JSONResponse(status_code=http.HTTPStatus.OK, content=response)
+    except UnauthorizedException:
+        return JSONResponse(status_code=http.HTTPStatus.UNAUTHORIZED, content={"message": "Unauthorized to access"})
+    except ForbiddenException:
+        return JSONResponse(status_code=http.HTTPStatus.FORBIDDEN, content={"message": "Access denied"})
     except Exception as err:
         logger.error(f"{err}")
         return JSONResponse(status_code=http.HTTPStatus.BAD_REQUEST, content={"message": "Something went wrong"})

@@ -16,6 +16,8 @@ from uuid import uuid4
 
 from fastapi import APIRouter, Depends
 from starlette.responses import JSONResponse
+
+from app.exceptions.exceptions import UnauthorizedException, ForbiddenException
 from app.utils.authentication import oauth2_scheme, decode_token
 from loguru import logger
 
@@ -23,7 +25,7 @@ invoices_endpoint_v1_router = APIRouter()
 
 
 @invoices_endpoint_v1_router.get('/invoices:long_process')
-def eg_long_process():
+def eg_long_process(token: any = Depends(oauth2_scheme)):
     """
     Long processes are usually called asynchronously, that is: The server receives the
     call and processes it independently, without the client being "stuck" waiting for the response.
@@ -35,9 +37,13 @@ def eg_long_process():
     :return: 202 - Accepted response with Location header
     """
     try:
-        # decode_token(token.credentials)
+        decode_token(token.credentials)
         location_header = {"Location": f"iceteam/v1/processes/{str(uuid4())}"}
         return JSONResponse(status_code=http.HTTPStatus.ACCEPTED, headers=location_header)
+    except UnauthorizedException:
+        return JSONResponse(status_code=http.HTTPStatus.UNAUTHORIZED, content={"message": "Unauthorized to access"})
+    except ForbiddenException:
+        return JSONResponse(status_code=http.HTTPStatus.FORBIDDEN, content={"message": "Access denied"})
     except Exception as err:
         logger.error(f"{err}")
         return JSONResponse(status_code=http.HTTPStatus.BAD_REQUEST, content={"message": "Something went wrong"})

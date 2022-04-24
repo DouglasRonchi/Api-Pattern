@@ -19,27 +19,26 @@ def decode_token(token):
             token = token.split()[-1]
         data = jwt.decode(token, secret_key, options={"verify_signature": True}, algorithms=["HS512", "HS256"])
         # TODO PERMISSIONS Must be implemented
-        if data.get("email") not in ["test@test.com"]:
+        BLACK_LIST = ["test_bad@test.com"]
+        if data.get("email") in BLACK_LIST:
             raise ForbiddenException
         return data
 
     except jwt.DecodeError:
-        message = f"Token invalid {token} "
-        logger.warning(message)
+        logger.warning(f"Token invalid {token}")
+        raise UnauthorizedException
 
     except ForbiddenException:
+        logger.warning("Token with access denied")
         raise ForbiddenException
 
-    except Exception as e:
-        message = f"Something happened on decode token - {e.args}"
-        logger.warning(message)
-
-    raise UnauthorizedException
+    except Exception as err:
+        logger.warning(f"Something happened on decode token - {err.args}")
+        raise UnauthorizedException
 
 
 def generate_token(email: str = ""):
     """
-
     :param email: Email that will be used to generate a token
     :return:
     """

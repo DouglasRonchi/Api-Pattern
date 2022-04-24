@@ -106,7 +106,7 @@ class TestCustomerEndpoints(unittest.TestCase):
         self.assertEqual(HTTPStatus.UNAUTHORIZED, response.status_code)
 
     def test_when_denied_access_to_operation_or_resource_or_not_authorized_to_access_should_return_403(self):
-        authentication_token = generate_token("")
+        authentication_token = generate_token("test_bad@test.com")
         response = self.client.get("iceteam/v1/customers:paginated",
                                    headers={"Authorization": authentication_token})
         self.assertEqual(HTTPStatus.FORBIDDEN, response.status_code)
