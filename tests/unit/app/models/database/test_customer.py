@@ -1,4 +1,6 @@
 import unittest
+from datetime import datetime
+
 import pytest
 from mongoengine import disconnect, connect
 
@@ -10,15 +12,38 @@ class TestCustomerModel(unittest.TestCase):
         disconnect()
         connect(db="mongomock", host="mongomock://localhost")
         user = Customer()
-        user.email = 'mario@test.com.br'
+        user.name = "mario"
+        user.email = "mario@test.com.br"
+        user.cpf = "12345678988"
+        user.city = "Chinatown"
+        user.created_at = datetime(2022, 2, 2)
+        user.updated_at = datetime(2022, 2, 2)
         user.save_safe()
 
     def tearDown(self) -> None:
         disconnect()
 
-    def test_email_duplicated_save(self):
+    def test_when_save_a_new_customer_with_email_duplicated(self):
         user = Customer()
+        user.name = "mario"
         user.email = "mario@test.com.br"
+        user.cpf = "12345678988"
+        user.city = "Chinatown"
+        user.created_at = datetime(2022, 2, 2)
+        user.updated_at = datetime(2022, 2, 2)
+        with pytest.raises(Exception) as err:
+            user.save_safe(user)
+
+        assert err.typename == "NotUniqueError"
+
+    def test_when_save_a_new_customer_with_cpf_duplicated(self):
+        user = Customer()
+        user.name = "mario"
+        user.email = "mariotest@test.com.br"
+        user.cpf = "12345678988"
+        user.city = "Chinatown"
+        user.created_at = datetime(2022, 2, 2)
+        user.updated_at = datetime(2022, 2, 2)
         with pytest.raises(Exception) as err:
             user.save_safe(user)
 

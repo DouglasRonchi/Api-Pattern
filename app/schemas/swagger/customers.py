@@ -13,6 +13,7 @@ class Message(BaseModel):
 class CustomerResponseOK(BaseModel):
     id: str
     name: str
+    city: str
     created_at: datetime
     updated_at: datetime
 

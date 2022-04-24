@@ -5,19 +5,24 @@ import mongoengine
 from mongoengine import ConnectionFailure
 from pymongo.errors import ServerSelectionTimeoutError, OperationFailure
 
-from app.db.database_interface import DatabaseInterface
 from app.settings.settings import Settings
 from loguru import logger
 
+from app.utils.singleton import Singleton
 
-class MongoDB(DatabaseInterface):
-    def __init__(self):
-        self.client = None
 
-    def connect(self):
+class MongoDB(metaclass=Singleton):
+    def connect(self, db: str = None, host: str = None):
+        """
+        :param db: The database name to connect
+        :param host: The Host name to connect to Mongo
+        :return: None
+        """
         try:
+            logger.debug("Getting settings to connect to Mongo")
+            host = Settings().MONGODB_URI if not host else host
             logger.debug('Connecting to Mongo')
-            self.client = mongoengine.connect(host=Settings().MONGODB_URI)
+            self.client = mongoengine.connect(db=db, host=host)
             logger.debug('Connected to Mongo')
         except ConnectionFailure as err:
             if "Use disconnect() first" in err.args[0]:
@@ -25,6 +30,8 @@ class MongoDB(DatabaseInterface):
 
     def check_connection(self):
         try:
+            if not self.client:
+                return False
             self.client.server_info()
             return True
         except ServerSelectionTimeoutError as err:

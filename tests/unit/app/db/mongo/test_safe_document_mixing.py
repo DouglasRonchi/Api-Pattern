@@ -5,7 +5,7 @@ import unittest
 from mongoengine import QuerySet, Document, StringField, disconnect, connect
 from unittest.mock import patch
 
-from app.database.mongo.mongo_safe_document import SafeDocumentMixin
+from app.db.mongo.mongo_safe_document import SafeDocument
 from app.exceptions.exceptions import (
     MongoSaveException,
     MongoObjectsException,
@@ -21,10 +21,10 @@ class TestSafeDocumentMixin(unittest.TestCase):
         disconnect()
 
     def test_initialize_safe_document_mixing(self):
-        SafeDocumentMixin()
+        SafeDocument()
 
     def test_save_safe_with_success(self):
-        class TestModel(Document, SafeDocumentMixin):
+        class TestModel(Document, SafeDocument):
             test_field = StringField()
             meta = {"collection": "test_collection"}
 
@@ -33,9 +33,9 @@ class TestSafeDocumentMixin(unittest.TestCase):
         self.assertEqual(object_created.test_field, "test_value")
         self.assertEqual(len(TestModel.objects.all()), 1)
 
-    @patch("app.db.safe_document_mixing.time")
+    @patch("app.db.mongo.mongo_safe_document.time")
     def test_save_safe_with_error(self, time_mock):
-        class TestModel(Document, SafeDocumentMixin):
+        class TestModel(Document, SafeDocument):
             test_field = StringField()
             meta = {"collection": "test_collection", "allow_inheritance": True}
 
@@ -49,7 +49,7 @@ class TestSafeDocumentMixin(unittest.TestCase):
         self.assertEqual(time_mock.sleep.call_count, 5)
 
     def test_objects_safe_with_success(self):
-        class TestModel(Document, SafeDocumentMixin):
+        class TestModel(Document, SafeDocument):
             test_field = StringField()
             meta = {"collection": "test_collection"}
 
@@ -57,9 +57,9 @@ class TestSafeDocumentMixin(unittest.TestCase):
         self.assertIsInstance(objects_results, QuerySet)
         self.assertEqual(list(objects_results), [])
 
-    @patch("app.db.safe_document_mixing.time")
+    @patch("app.db.mongo.mongo_safe_document.time")
     def test_objects_safe_with_error(self, time_mock):
-        class TestModel(Document, SafeDocumentMixin):
+        class TestModel(Document, SafeDocument):
             test_field = StringField()
             meta = {"collection": "test_collection", "allow_inheritance": True}
 

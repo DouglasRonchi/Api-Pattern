@@ -19,6 +19,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends
 from starlette.responses import JSONResponse
 
+from app.exceptions.exceptions import UnauthorizedException, ForbiddenException
 from app.schemas.customer import CustomerSchema
 from app.schemas.swagger.customers import get_customer_by_id_responses, create_new_customer_responses
 from app.services.customer import CustomerService
@@ -34,17 +35,19 @@ customers_endpoint_v3_router = customers_endpoint_v1_router
 @customers_endpoint_v1_router.get('/customers:paginated')
 def get_all_customers_paginated(_order: str = "",
                                 _page: int = 1,
-                                _size: Optional[int] = 10):
+                                _size: Optional[int] = 10,
+                                token: any = Depends(oauth2_scheme)):
     """
     Returns to the 1st page of the customer collection
     :param _page: Set the current page, default is 1. type: int
     :param _size: Set the page size, the size of items in the page, default is 10. type: int
     :param _order: If the ordering direction of some attribute is not informed, asc will be used by default. type: str
                     Eg. _order="name asc, created_at desc"
+    :param token: Token to authenticate with server to start request
     :return:
     """
     try:
-        # decode_token(token.credentials)
+        decode_token(token.credentials)
         data = [
             {"id", 1},
             {"id", 2}
@@ -56,54 +59,71 @@ def get_all_customers_paginated(_order: str = "",
             "total_pages": ceil(len(data) / _size)
         }
         return JSONResponse(status_code=http.HTTPStatus.OK, content=data)
+    except UnauthorizedException:
+        return JSONResponse(status_code=http.HTTPStatus.UNAUTHORIZED, content={"message": "Unauthorized to access"})
+    except ForbiddenException:
+        return JSONResponse(status_code=http.HTTPStatus.FORBIDDEN, content={"message": "Access denied"})
     except Exception as err:
         logger.error(f"Error {err}")
         return JSONResponse(status_code=http.HTTPStatus.BAD_REQUEST, content={"message": "Something went wrong"})
 
 
 @customers_endpoint_v1_router.get('/customers')
-def get_all_customers():
+def get_all_customers(token: any = Depends(oauth2_scheme)):
     """
     Returns to the 1st page of the customer collection
     :return:
     """
     try:
-        # decode_token(token.credentials)
+        decode_token(token.credentials)
         data = {}
         return JSONResponse(status_code=http.HTTPStatus.OK, content=data)
+    except UnauthorizedException:
+        return JSONResponse(status_code=http.HTTPStatus.UNAUTHORIZED, content={"message": "Unauthorized to access"})
+    except ForbiddenException:
+        return JSONResponse(status_code=http.HTTPStatus.FORBIDDEN, content={"message": "Access denied"})
     except Exception as err:
         logger.error(f"Error {err}")
         return JSONResponse(status_code=http.HTTPStatus.BAD_REQUEST, content={"message": "Something went wrong"})
 
 
 @customers_endpoint_v1_router.get('/customers/{customer_id}:print')
-def print_customer_on_old_printer():
+def print_customer_on_old_printer(token: any = Depends(oauth2_scheme)):
     """
     Actions like (:print) must be before the common get_by_id (/customers/{customer_id})
     Make a custom action, in this case "print".
     :return:
     """
     try:
-        # decode_token(token.credentials)
+        decode_token(token.credentials)
         data = {"action": "Printing customer on an old printer"}
         return JSONResponse(status_code=http.HTTPStatus.OK, content=data)
+    except UnauthorizedException:
+        return JSONResponse(status_code=http.HTTPStatus.UNAUTHORIZED, content={"message": "Unauthorized to access"})
+    except ForbiddenException:
+        return JSONResponse(status_code=http.HTTPStatus.FORBIDDEN, content={"message": "Access denied"})
     except Exception as err:
         logger.error(f"Error {err}")
         return JSONResponse(status_code=http.HTTPStatus.BAD_REQUEST, content={"message": "Something went wrong"})
 
 
 @customers_endpoint_v1_router.get('/customers/{customer_id}', responses=get_customer_by_id_responses)
-def get_customer_by_id(customer_id):
+def get_customer_by_id(customer_id, token: any = Depends(oauth2_scheme)):
     """
     Returns the client with the id on the params {customer_id}
+    :param token: Token to authenticate with server to start request
     :param customer_id: The customer id. type: str(uuid4)
     :return:
     """
     try:
-        # decode_token(token.credentials)
+        decode_token(token.credentials)
         # TODO just to show * Idempotence *: Must be removed: Need to Implement
         data = get_fake_customer(customer_id)
         return JSONResponse(status_code=http.HTTPStatus.OK, content=data)
+    except UnauthorizedException:
+        return JSONResponse(status_code=http.HTTPStatus.UNAUTHORIZED, content={"message": "Unauthorized to access"})
+    except ForbiddenException:
+        return JSONResponse(status_code=http.HTTPStatus.FORBIDDEN, content={"message": "Access denied"})
     except Exception as err:
         logger.error(f"Error {err}")
         return JSONResponse(status_code=http.HTTPStatus.BAD_REQUEST, content={"message": "Something went wrong"})
@@ -123,67 +143,86 @@ def get_fake_customer(customer_id):
 
 
 @customers_endpoint_v1_router.post('/customers', responses=create_new_customer_responses)
-def create_new_customer(customer: CustomerSchema):
+def create_new_customer(customer: CustomerSchema, token: any = Depends(oauth2_scheme)):
     """
     Create a new customer and add it to the customers collection
     :return:
     """
     try:
-        # decode_token(token.credentials)
+        decode_token(token.credentials)
         CustomerService().create_new_customer(customer)
         return JSONResponse(status_code=http.HTTPStatus.CREATED)
+    except UnauthorizedException:
+        return JSONResponse(status_code=http.HTTPStatus.UNAUTHORIZED, content={"message": "Unauthorized to access"})
+    except ForbiddenException:
+        return JSONResponse(status_code=http.HTTPStatus.FORBIDDEN, content={"message": "Access denied"})
     except Exception as err:
         logger.error(f"Error {err}")
         return JSONResponse(status_code=http.HTTPStatus.BAD_REQUEST, content={"message": "Something went wrong"})
 
 
 @customers_endpoint_v1_router.put('/customers/{customer_id}')
-def update_all_customer_fields(customer_id):
+def update_all_customer_fields(customer_id, token: any = Depends(oauth2_scheme)):
     """
     Changes all customer fields except id,
     according to the values that are passed in the body of the request.
     Fields that are not passed will be considered null.
+    :param token: Token to authenticate with server to start request
     :param customer_id: The customer id. type: str(uuid4)
     :return:
     """
 
     try:
-        # decode_token(token.credentials)
+        decode_token(token.credentials)
         data = {customer_id: customer_id}
         return JSONResponse(status_code=http.HTTPStatus.OK, content=data)
+    except UnauthorizedException:
+        return JSONResponse(status_code=http.HTTPStatus.UNAUTHORIZED, content={"message": "Unauthorized to access"})
+    except ForbiddenException:
+        return JSONResponse(status_code=http.HTTPStatus.FORBIDDEN, content={"message": "Access denied"})
     except Exception as err:
         logger.error(f"Error {err}")
         return JSONResponse(status_code=http.HTTPStatus.BAD_REQUEST, content={"message": "Something went wrong"})
 
 
 @customers_endpoint_v1_router.patch('/customers/{customer_id}')
-def update_specific_customer_fields(customer_id):
+def update_specific_customer_fields(customer_id, token: any = Depends(oauth2_scheme)):
     """
     Change only the fields passed in the request.
     ATTENTION: The format of the JSON passed must follow the standard defined in RFC6902
+    :param token: Token to authenticate with server to start request
     :param customer_id: The customer id. type: str(uuid4)
     :return:
     """
     try:
-        # decode_token(token.credentials)
+        decode_token(token.credentials)
         # Update fields that comes from body
         return JSONResponse(status_code=http.HTTPStatus.OK)
+    except UnauthorizedException:
+        return JSONResponse(status_code=http.HTTPStatus.UNAUTHORIZED, content={"message": "Unauthorized to access"})
+    except ForbiddenException:
+        return JSONResponse(status_code=http.HTTPStatus.FORBIDDEN, content={"message": "Access denied"})
     except Exception as err:
         logger.error(f"Error {err}")
         return JSONResponse(status_code=http.HTTPStatus.BAD_REQUEST, content={"message": "Something went wrong"})
 
 
 @customers_endpoint_v1_router.delete('/customers/{customer_id}')
-def delete_customer_by_id(customer_id):
+def delete_customer_by_id(customer_id, token: any = Depends(oauth2_scheme)):
     """
     Delete customer by customer id
+    :param token: Token to authenticate with server to start request
     :param customer_id: The customer id. type: str(uuid4)
     :return:
     """
     try:
-        # decode_token(token.credentials)
+        decode_token(token.credentials)
         # Delete customer by id
         return JSONResponse(status_code=http.HTTPStatus.OK)
+    except UnauthorizedException:
+        return JSONResponse(status_code=http.HTTPStatus.UNAUTHORIZED, content={"message": "Unauthorized to access"})
+    except ForbiddenException:
+        return JSONResponse(status_code=http.HTTPStatus.FORBIDDEN, content={"message": "Access denied"})
     except Exception as err:
         logger.error(f"Error {err}")
         return JSONResponse(status_code=http.HTTPStatus.BAD_REQUEST, content={"message": "Something went wrong"})

@@ -11,9 +11,18 @@ class MongoObjectsException(Exception):
     """Raise when there an error on try to query something on mongo"""
 
 
-class NotFoundAnyUser(Exception):
-    """Raise when cannot find any user on database"""
+class NotFoundAnyCustomer(Exception):
+    """Raise when cannot find any customer on database"""
 
 
 class CannotUpdateNotFoundCustomer(Exception):
     """Raise when trying to update a customer that not exists on database"""
+
+
+class UnauthorizedException(Exception):
+    """ Raise when got some error on decode token"""
+
+
+class ForbiddenException(Exception):
+    """ Raise when got denied access to operation or resource, not authorized to access"""
+

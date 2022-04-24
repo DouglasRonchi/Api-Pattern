@@ -10,7 +10,7 @@ from app.endpoints.customers_v1 import customers_endpoint_v1_router, customers_e
 from app.endpoints.invoices_v1 import invoices_endpoint_v1_router
 from app.endpoints.processes_v1 import processes_endpoint_v1_router
 from app.endpoints.shipping_addresses_v1 import shipping_addresses_endpoint_v1_router
-from app.healthchecks.endpoint_healthcheck import health_check_router
+from app.endpoints.healthcheck import health_check_router
 from loguru import logger
 
 logger.info(f"Starting API")

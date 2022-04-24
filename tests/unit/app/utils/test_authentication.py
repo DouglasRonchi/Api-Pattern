@@ -13,7 +13,7 @@ class TestAuthRequired(unittest.TestCase):
         os.environ.setdefault("SECRET_KEY_AUTH_SAML", "testing")
         os.environ.setdefault("MONGODB_URI", "testing")
         settings_mock().SECRET_KEY_AUTH_SAML = "testing"
-        token = generate_token()
+        token = generate_token("test@test.com")
         decode_token(token)
 
         assert settings_mock.called_once
@@ -24,7 +24,7 @@ class TestAuthRequired(unittest.TestCase):
         os.environ.setdefault("SECRET_KEY_AUTH_SAML", "testing")
         os.environ.setdefault("MONGODB_URI", "testing")
         settings_mock().SECRET_KEY_AUTH_SAML = "testing"
-        token = generate_token()
+        token = generate_token("test@test.com")
         token = f"Bearer {token}"
         decode_token(token)
 
@@ -40,9 +40,7 @@ class TestAuthRequired(unittest.TestCase):
         with pytest.raises(Exception) as err:
             decode_token(token)
 
-        assert err.typename == 'HTTPException'
-        assert err.value.status_code == 401
-        assert err.value.detail == 'Token invalid 1234 '
+        assert err.typename == 'UnauthorizedException'
         assert settings_mock.called_once
 
     @patch("app.utils.authentication.Settings")
@@ -57,9 +55,7 @@ class TestAuthRequired(unittest.TestCase):
         with pytest.raises(Exception) as err:
             decode_token(token)
 
-        assert err.typename == 'HTTPException'
-        assert err.value.status_code == 401
-        assert err.value.detail == 'Something happened  - ("argument of type \'int\' is not iterable",)'
+        assert err.typename == 'UnauthorizedException'
         assert settings_mock.called_once
 
         assert settings_mock.called_once
@@ -74,7 +70,7 @@ class TestAuthRequired(unittest.TestCase):
         settings_mock().SECRET_KEY_AUTH_SAML = "testing"
         uuid_mock.uuid4.side_effect = [Exception]
 
-        generate_token()
+        generate_token("test@test.com")
 
         assert settings_mock.called_once
 

@@ -5,15 +5,17 @@ from http import HTTPStatus
 from fastapi.testclient import TestClient
 from mongoengine import disconnect, connect
 
+from app.db.mongo.mongo_repository import MongoDB
+
 os.environ.setdefault("MONGODB_URI", "test")
 
 
 class TestHealthCheck(unittest.TestCase):
     def setUp(self) -> None:
         from app.main import app
-        disconnect()
         self.client = TestClient(app)
-        connect(db="mongomock", host="mongomock://localhost")
+        disconnect()
+        MongoDB().connect("mongomock", host="mongomock://localhost")
 
     def tearDown(self) -> None:
         disconnect()
