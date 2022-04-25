@@ -1,5 +1,5 @@
 """
-This is a iceteam authentication settings module
+This is a project settings module
 """
 from pydantic import BaseSettings, Field
 

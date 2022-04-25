@@ -1,3 +1,7 @@
+"""
+A Database Interface
+Uses to force the implementation of the methods that a database class should to have.
+"""
 from abc import ABC, abstractmethod
 
 

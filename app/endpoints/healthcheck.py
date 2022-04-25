@@ -1,3 +1,6 @@
+"""
+The Project HealthCheck Module
+"""
 import http
 from fastapi import APIRouter
 from starlette.responses import JSONResponse

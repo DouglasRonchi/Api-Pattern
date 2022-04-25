@@ -1,5 +1,5 @@
 """
-Permissions Response Schema module
+Swagger documentation for customer schema module
 """
 from pydantic import BaseModel, Field
 from typing import List

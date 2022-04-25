@@ -1,8 +1,11 @@
+"""
+Authentication module.
+It helps to generate a unique token and decode it based on the secret key
+"""
 from datetime import datetime, timedelta
 from uuid import uuid4
 
 import jwt
-from fastapi import HTTPException
 from fastapi.security import HTTPBearer
 from loguru import logger
 
